@@ -1,0 +1,776 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adura - Tomi | MTN Data Bundles</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f7ff;
+            color: #17345d;
+            line-height: 1.6;
+        }
+
+        :root {
+            --blue: #0755b8;
+            --dark-blue: #06336f;
+            --light-blue: #e7f1ff;
+            --white: #ffffff;
+        }
+
+        /* HEADER */
+
+        header {
+            background: white;
+            padding: 15px 7%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 23px;
+            font-weight: bold;
+            color: var(--blue);
+        }
+
+        .logo span {
+            color: #f0a500;
+        }
+
+        nav {
+            display: flex;
+            gap: 22px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--dark-blue);
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        nav a:hover {
+            color: #f0a500;
+        }
+
+        .menu-button {
+            display: none;
+            background: var(--blue);
+            color: white;
+            border: none;
+            padding: 9px 13px;
+            border-radius: 8px;
+            font-size: 20px;
+        }
+
+        /* HERO SECTION */
+
+        .hero {
+            min-height: 480px;
+            display: flex;
+            align-items: center;
+            padding: 70px 8%;
+            color: white;
+            background:
+                linear-gradient(110deg, rgba(3,35,83,0.94),
+                rgba(5,91,190,0.72)),
+                url("https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=1600&q=85");
+            background-size: cover;
+            background-position: center;
+        }
+
+        .hero-content {
+            max-width: 650px;
+        }
+
+        .hero-label {
+            display: inline-block;
+            background: rgba(255,255,255,0.17);
+            border: 1px solid rgba(255,255,255,0.4);
+            padding: 7px 16px;
+            border-radius: 30px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            line-height: 1.15;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 span {
+            color: #ffd166;
+        }
+
+        .hero p {
+            font-size: 17px;
+            margin-bottom: 28px;
+            color: #edf5ff;
+        }
+
+        .main-button {
+            display: inline-block;
+            background: #ffd166;
+            color: #17345d;
+            padding: 13px 25px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .main-button:hover {
+            background: white;
+            transform: translateY(-3px);
+        }
+
+        /* GENERAL SECTIONS */
+
+        section {
+            padding: 65px 7%;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .section-title h2 {
+            font-size: 30px;
+            color: var(--dark-blue);
+        }
+
+        .section-title p {
+            color: #62758f;
+            margin-top: 8px;
+        }
+
+        /* PACKAGE */
+
+        .package-container {
+            display: flex;
+            justify-content: center;
+        }
+
+        .package-card {
+            background: white;
+            width: 100%;
+            max-width: 350px;
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(5,65,130,0.12);
+            border: 1px solid #dceaff;
+            transition: 0.3s;
+        }
+
+        .package-card:hover {
+            transform: translateY(-7px);
+        }
+
+        .package-top {
+            background: linear-gradient(135deg, #0873df, #043b86);
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .package-top h3 {
+            font-size: 25px;
+        }
+
+        .package-top p {
+            opacity: 0.9;
+        }
+
+        .package-details {
+            padding: 25px;
+            text-align: center;
+        }
+
+        .price {
+            font-size: 35px;
+            font-weight: bold;
+            color: var(--blue);
+            margin: 10px 0 20px;
+        }
+
+        .package-details button {
+            width: 100%;
+            background: var(--blue);
+            color: white;
+            border: none;
+            padding: 13px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .package-details button:hover {
+            background: var(--dark-blue);
+        }
+
+        /* ABOUT */
+
+        .about {
+            background: white;
+        }
+
+        .about-content {
+            max-width: 850px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .about-content p {
+            color: #5c6e85;
+            margin-top: 12px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .feature {
+            background: var(--light-blue);
+            padding: 25px 15px;
+            border-radius: 15px;
+        }
+
+        .feature h3 {
+            color: var(--blue);
+            margin-bottom: 8px;
+        }
+
+        /* ORDER FORM */
+
+        .order-section {
+            background: #eaf3ff;
+        }
+
+        .order-box {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.07);
+        }
+
+        .order-box label {
+            display: block;
+            font-weight: bold;
+            margin: 15px 0 7px;
+        }
+
+        .order-box input,
+        .order-box select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #c9d9ee;
+            border-radius: 9px;
+            font-size: 15px;
+            outline: none;
+            background: white;
+        }
+
+        .order-box input:focus,
+        .order-box select:focus {
+            border-color: var(--blue);
+        }
+
+        .submit-button {
+            width: 100%;
+            margin-top: 22px;
+            padding: 14px;
+            background: #0873df;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .submit-button:hover {
+            background: var(--dark-blue);
+        }
+
+        .payment-note {
+            background: #f0f6ff;
+            padding: 16px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .copy-button {
+            background: white;
+            color: var(--blue);
+            border: 1px solid var(--blue);
+            padding: 7px 12px;
+            border-radius: 7px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+
+        /* CONTACT */
+
+        .contact {
+            background: white;
+        }
+
+        .contact-card {
+            max-width: 650px;
+            margin: auto;
+            background: #f0f6ff;
+            border-radius: 18px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .contact-card p {
+            margin: 12px 0;
+        }
+
+        .contact-card a {
+            color: var(--blue);
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .whatsapp-button {
+            display: inline-block;
+            background: #159b55;
+            color: white !important;
+            padding: 13px 23px;
+            border-radius: 30px;
+            margin-top: 15px;
+        }
+
+        /* FOOTER */
+
+        footer {
+            background: #062b5e;
+            color: white;
+            text-align: center;
+            padding: 25px 15px;
+        }
+
+        footer p {
+            margin: 5px;
+            font-size: 14px;
+        }
+
+        /* MOBILE DESIGN */
+
+        @media (max-width: 700px) {
+            header {
+                padding: 13px 5%;
+            }
+
+            .menu-button {
+                display: block;
+            }
+
+            nav {
+                display: none;
+                position: absolute;
+                top: 65px;
+                left: 0;
+                width: 100%;
+                background: white;
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: 0 5px 12px rgba(0,0,0,0.1);
+            }
+
+            nav.show {
+                display: flex;
+            }
+
+            .hero {
+                min-height: 420px;
+                padding: 55px 7%;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero p {
+                font-size: 15px;
+            }
+
+            section {
+                padding: 50px 6%;
+            }
+
+            .section-title h2 {
+                font-size: 25px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .order-box {
+                padding: 22px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+
+    <header>
+        <div class="logo">Adura <span>- Tomi</span></div>
+
+        <button class="menu-button" id="menuButton"
+            aria-label="Open navigation menu">☰</button>
+
+        <nav id="navigation">
+            <a href="#home">Home</a>
+            <a href="#packages">Packages</a>
+            <a href="#about">About</a>
+            <a href="#order">Order</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </header>
+
+    <!-- HERO -->
+
+    <section class="hero" id="home">
+        <div class="hero-content">
+
+            <div class="hero-label">
+                WELCOME TO ADURA - TOMI
+            </div>
+
+            <h1>
+                Stay Connected<br>
+                with <span>Affordable Data</span>
+            </h1>
+
+            <p>
+                Get your MTN data bundle through Adura - Tomi.
+                Place your order easily and contact us for assistance.
+            </p>
+
+            <a href="#packages" class="main-button">
+                View Data Package
+            </a>
+
+        </div>
+    </section>
+
+    <!-- PACKAGES -->
+
+    <section id="packages">
+
+        <div class="section-title">
+            <h2>Our Data Package</h2>
+            <p>Choose your available MTN data bundle.</p>
+        </div>
+
+        <div class="package-container">
+
+            <div class="package-card">
+
+                <div class="package-top">
+                    <h3>MTN Data Bundle</h3>
+                    <p>Stay connected with Adura - Tomi</p>
+                </div>
+
+                <div class="package-details">
+                    <h2>MTN 1GB</h2>
+
+                    <div class="price">GH₵4.50</div>
+
+                    <p>Affordable data for your internet needs.</p>
+
+                    <button onclick="selectPackage()">
+                        Order This Package
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ABOUT -->
+
+    <section class="about" id="about">
+
+        <div class="about-content">
+
+            <div class="section-title">
+                <h2>About Adura - Tomi</h2>
+                <p>Your data bundle connection point.</p>
+            </div>
+
+            <p>
+                Adura - Tomi is a data bundle sales business
+                offering MTN data packages. Our goal is to make
+                ordering data simple and convenient for customers.
+            </p>
+
+            <div class="features">
+
+                <div class="feature">
+                    <h3>Easy Ordering</h3>
+                    <p>Place your order through our website.</p>
+                </div>
+
+                <div class="feature">
+                    <h3>WhatsApp</h3>
+                    <p>Contact us directly for assistance.</p>
+                </div>
+
+                <div class="feature">
+                    <h3>MoMo Payment</h3>
+                    <p>Pay using the displayed Mobile Money number.</p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ORDER FORM -->
+
+    <section class="order-section" id="order">
+
+        <div class="section-title">
+            <h2>Place Your Order</h2>
+            <p>Fill in your details to send your order through WhatsApp.</p>
+        </div>
+
+        <div class="order-box">
+
+            <form id="orderForm">
+
+                <label for="customerName">Your Name</label>
+                <input
+                    type="text"
+                    id="customerName"
+                    placeholder="Enter your name"
+                    required
+                >
+
+                <label for="customerPhone">Phone Number to Receive Data</label>
+                <input
+                    type="tel"
+                    id="customerPhone"
+                    placeholder="e.g. 0241234567"
+                    required
+                >
+
+                <label for="package">Select Package</label>
+                <select id="package" required>
+                    <option value="MTN 1GB - GH₵4.50">
+                        MTN 1GB - GH₵4.50
+                    </option>
+                </select>
+
+                <label for="transaction">MoMo Transaction Reference (if paid)</label>
+                <input
+                    type="text"
+                    id="transaction"
+                    placeholder="Enter reference or leave blank"
+                >
+
+                <div class="payment-note">
+                    <strong>MoMo Payment Details</strong>
+
+                    <p>Network: MTN MoMo</p>
+                    <p>Number: <strong>0550698143</strong></p>
+                    <p>Name: Confirm the recipient name before paying.</p>
+
+                    <button type="button" class="copy-button"
+                        onclick="copyNumber()">
+                        Copy MoMo Number
+                    </button>
+
+                    <p style="margin-top:12px;">
+                        Payment is made manually. Please confirm
+                        the recipient details before sending money.
+                        Your order will be sent to WhatsApp for confirmation.
+                    </p>
+                </div>
+
+                <button type="submit" class="submit-button">
+                    Send Order on WhatsApp
+                </button>
+
+            </form>
+
+        </div>
+
+    </section>
+
+    <!-- CONTACT -->
+
+    <section class="contact" id="contact">
+
+        <div class="section-title">
+            <h2>Contact Us</h2>
+            <p>We are ready to receive your enquiries.</p>
+        </div>
+
+        <div class="contact-card">
+
+            <p><strong>Business:</strong> Adura - Tomi</p>
+
+            <p>
+                <strong>Phone:</strong>
+                <a href="tel:0550698143">0550698143</a>
+            </p>
+
+            <p>
+                <strong>Email:</strong>
+                <a href="mailto:ateeseisc123@gmail.com">
+                    ateeseisc123@gmail.com
+                </a>
+            </p>
+
+            <p><strong>MoMo:</strong> 0550698143</p>
+
+            <a
+                class="whatsapp-button"
+                href="https://wa.me/233550698143"
+                target="_blank"
+                rel="noopener"
+            >
+                Chat with Us on WhatsApp
+            </a>
+
+        </div>
+
+    </section>
+
+    <!-- FOOTER -->
+
+    <footer>
+        <h3>Adura - Tomi</h3>
+        <p>Affordable MTN Data Bundles</p>
+        <p>&copy; <span id="year"></span> Adura - Tomi. All rights reserved.</p>
+    </footer>
+
+    <!-- JAVASCRIPT -->
+
+    <script>
+
+        // MOBILE MENU
+
+        const menuButton = document.getElementById("menuButton");
+        const navigation = document.getElementById("navigation");
+
+        menuButton.addEventListener("click", function () {
+            navigation.classList.toggle("show");
+        });
+
+        // CLOSE MENU AFTER CLICKING A LINK
+
+        document.querySelectorAll("#navigation a").forEach(function(link) {
+            link.addEventListener("click", function() {
+                navigation.classList.remove("show");
+            });
+        });
+
+        // SELECT PACKAGE
+
+        function selectPackage() {
+            document.getElementById("order").scrollIntoView({
+                behavior: "smooth"
+            });
+        }
+
+        // COPY MOMO NUMBER
+
+        function copyNumber() {
+            const number = "0550698143";
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(number)
+                    .then(function() {
+                        alert("MoMo number copied: " + number);
+                    })
+                    .catch(function() {
+                        alert("Please copy the number manually: " + number);
+                    });
+            } else {
+                alert("Please copy the MoMo number: " + number);
+            }
+        }
+
+        // SEND CUSTOMER ORDER TO WHATSAPP
+
+        const orderForm = document.getElementById("orderForm");
+
+        orderForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById("customerName").value.trim();
+            const phone = document.getElementById("customerPhone").value.trim();
+            const selectedPackage = document.getElementById("package").value;
+            const transaction = document.getElementById("transaction").value.trim();
+
+            if (!name || !phone) {
+                alert("Please enter your name and phone number.");
+                return;
+            }
+
+            const message =
+                "HELLO ADURA - TOMI!%0A%0A" +
+                "I want to place a data bundle order.%0A%0A" +
+                "Customer Name: " + encodeURIComponent(name) + "%0A" +
+                "Receiving Number: " + encodeURIComponent(phone) + "%0A" +
+                "Package: " + encodeURIComponent(selectedPackage) + "%0A" +
+                "Price: GH₵4.50%0A" +
+                "MoMo Reference: " +
+                encodeURIComponent(transaction || "Not provided") +
+                "%0A%0APlease confirm my order.";
+
+            const whatsappURL =
+                "https://wa.me/233550698143?text=" + message;
+
+            window.open(whatsappURL, "_blank");
+        });
+
+        // AUTOMATIC COPYRIGHT YEAR
+
+        document.getElementById("year").textContent =
+            new Date().getFullYear();
+
+    </script>
+
+</body>
+</html>
