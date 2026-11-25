@@ -15,10 +15,10 @@
         <span class="logo-icon">📊</span>
         <span class="brand-name">ISC <strong>ENTERPRISE</strong></span>
       </div>
-      <a href="#" class="community-btn">🔔 Join Community</a>
+      <a href="#" class="community-btn" id="communityBtn">🔔 Join Community</a>
     </div>
     <div class="nav-right">
-      <button class="menu-btn">☰</button>
+      <button class="menu-btn" id="menuBtn">☰</button>
     </div>
   </nav>
 
@@ -39,8 +39,8 @@
       </div>
 
       <div class="action-buttons">
-        <button class="btn-dark">🕒 Orders</button>
-        <button class="btn-dark">📄 Transactions</button>
+        <button class="btn-dark" id="ordersBtn">🕒 Orders</button>
+        <button class="btn-dark" id="transactionsBtn">📄 Transactions</button>
       </div>
 
       <div class="hero-footer">
@@ -49,7 +49,7 @@
           <span>🛡️ Secure</span>
           <span>🕒 24/7</span>
         </div>
-        <a href="#" class="help-pill">🎧 Need Help ›</a>
+        <a href="#" class="help-pill" id="helpBtn">🎧 Need Help ›</a>
       </div>
     </section>
 
@@ -57,14 +57,13 @@
     <section class="white-card">
       <h2>Place New Order</h2>
       <div class="network-grid">
-
-
-        <div class="network-box mtn-box" onclick="selectNetwork('MTN')">
+        
+        <div class="network-box mtn-box" onclick="openOrderModal('MTN')">
           <div class="network-circle mtn-circle">MTN</div>
           <p>MTN</p>
         </div>
 
-        <div class="network-box telecel-box" onclick="selectNetwork('Telecel')">
+        <div class="network-box telecel-box" onclick="openOrderModal('Telecel')">
           <div class="network-circle telecel-circle">t</div>
           <p>Telecel</p>
         </div>
@@ -73,20 +72,45 @@
     </section>
 
     <!-- 4. Recent Orders -->
-    <section class="white-card">
+    <section class="white-card" id="orders-section">
       <div class="card-header">
         <h2>Recent Orders</h2>
-        <a href="#" class="view-all">View All ›</a>
+        <a href="#orders-section" class="view-all">View All ›</a>
       </div>
-      <p class="empty-text">No recent orders yet. Select MTN or Telecel above to buy data.</p>
+      <div id="ordersList">
+        <p class="empty-text">No recent orders yet. Select MTN or Telecel above to buy data.</p>
+      </div>
     </section>
 
   </main>
 
+  <!-- Popup Order Form Modal -->
+  <div class="modal-overlay" id="orderModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modalTitle">Buy Data Bundle</h3>
+        <button class="close-btn" id="closeModalBtn">✕</button>
+      </div>
+      
+      <form id="bundleForm">
+        <div class="form-group">
+          <label for="bundleSelect">Choose Package:</label>
+          <select id="bundleSelect" required></select>
+        </div>
+
+        <div class="form-group">
+          <label for="recipientPhone">Recipient Phone Number:</label>
+          <input type="tel" id="recipientPhone" placeholder="e.g. 0241234567" maxlength="10" required />
+        </div>
+
+        <button type="submit" class="submit-btn">Place Order</button>
+      </form>
+    </div>
+  </div>
+
   <!-- Floating Chat Button -->
-  <button class="floating-chat" title="Support">💬</button>
+  <button class="floating-chat" id="chatBtn" title="Support">💬</button>
 
   <script src="script.js"></script>
 </body>
-  </html>
-  
+</html>
