@@ -1,102 +1,101 @@
-let heroHp = 100;
-const heroMaxHp = 100;
-let enemyHp = 80;
-const enemyMaxHp = 80;
-let isGameOver = false;
+const packages = {
+  MTN: [
+    "1 GB — GHS 5.00",
+    "2 GB — GHS 9.50",
+    "3 GB — GHS 13.50",
+    "5 GB — GHS 22.00",
+    "10 GB — GHS 42.00"
+  ],
+  Telecel: [
+    "2 GB — GHS 9.00",
+    "5 GB — GHS 20.00",
+    "10 GB — GHS 38.00",
+    "15 GB — GHS 55.00"
+  ]
+};
 
-function updateUI() {
-    document.getElementById('hero-hp-text').innerText = heroHp;
-    document.getElementById('enemy-hp-text').innerText = enemyHp;
+let selectedNetwork = "";
+const orders = [];
 
-    const heroPercent = (heroHp / heroMaxHp) * 100;
-    const enemyPercent = (enemyHp / enemyMaxHp) * 100;
-    document.getElementById('hero-hp').style.width = Math.max(0, heroPercent) + '%';
-    document.getElementById('enemy-hp').style.width = Math.max(0, enemyPercent) + '%';
+const modal = document.getElementById("orderModal");
+const modalTitle = document.getElementById("modalTitle");
+const bundleSelect = document.getElementById("bundleSelect");
+const bundleForm = document.getElementById("bundleForm");
+const ordersList = document.getElementById("ordersList");
+
+function openOrderModal(network) {
+  selectedNetwork = network;
+  modalTitle.textContent = `Buy ${network} Data`;
+
+  bundleSelect.innerHTML = "";
+  packages[network].forEach(pkg => {
+    const option = document.createElement("option");
+    option.value = pkg;
+    option.textContent = pkg;
+    bundleSelect.appendChild(option);
+  });
+
+  modal.style.display = "flex";
 }
 
-function logMessage(msg) {
-    const logBox = document.getElementById('battle-log');
-    logBox.innerHTML = `<p>${msg}</p>` + logBox.innerHTML;
+function closeOrderModal() {
+  modal.style.display = "none";
+  bundleForm.reset();
 }
 
-function playerAttack(type) {
-    if (isGameOver) return;
+document.getElementById("closeModalBtn").addEventListener("click", closeOrderModal);
 
-    let damage = 0;
-    if (type === 'light') {
-        damage = Math.floor(Math.random() * 8) + 10;
-        logMessage(`Quick Slash deals <strong>${damage}</strong> damage.`);
-    } else if (type === 'heavy') {
-        if (Math.random() > 0.3) {
-            damage = Math.floor(Math.random() * 15) + 18;
-            logMessage(`Heavy Strike hits for <strong>${damage}</strong> damage.`);
-        } else {
-            logMessage(`Heavy Strike missed!`);
-        }
-    }
+bundleForm.addEventListener("submit", function(event) {
+  event.preventDefault();
 
-    enemyHp -= damage;
-    if (enemyHp <= 0) {
-        enemyHp = 0;
-        updateUI();
-        logMessage(`<strong>Victory!</strong> You defeated the goblin.`);
-        endGame();
-        return;
-    }
+  const chosenBundle = bundleSelect.value;
+  const phone = document.getElementById("recipientPhone").value.trim();
 
-    updateUI();
-    disableControls(true);
-    setTimeout(enemyTurn, 1000);
+  if (phone.length < 10) {
+    alert("Please enter a valid 10-digit Ghana phone number.");
+    return;
+  }
+
+  orders.unshift({
+    network: selectedNetwork,
+    bundle: chosenBundle,
+    phone: phone,
+    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  });
+
+  renderOrders();
+  closeOrderModal();
+  alert(`Order placed for ${selectedNetwork} (${chosenBundle}) to ${phone}!`);
+});
+
+function renderOrders() {
+  if (orders.length === 0) return;
+
+  ordersList.innerHTML = orders.map(order => `
+    <div class="order-item">
+      <div class="order-info">
+        <strong>${order.network} • ${order.bundle}</strong>
+        <span>To: ${order.phone} • ${order.time}</span>
+      </div>
+      <span class="status-badge">Pending</span>
+    </div>
+  `).join("");
 }
 
-function playerHeal() {
-    if (isGameOver) return;
-
-    const healAmount = Math.floor(Math.random() * 10) + 15;
-    heroHp = Math.min(heroMaxHp, heroHp + healAmount);
-    logMessage(`You drank a potion and restored <strong>${healAmount}</strong> HP.`);
-
-    updateUI();
-    disableControls(true);
-    setTimeout(enemyTurn, 1000);
+function scrollToOrders() {
+  document.getElementById("orders-section").scrollIntoView({ behavior: "smooth" });
 }
 
-function enemyTurn() {
-    if (isGameOver) return;
-
-    const enemyDamage = Math.floor(Math.random() * 8) + 8;
-    heroHp -= enemyDamage;
-    logMessage(`The goblin strikes back for <strong>${enemyDamage}</strong> damage.`);
-
-    if (heroHp <= 0) {
-        heroHp = 0;
-        updateUI();
-        logMessage(`<strong>Game Over!</strong> You were defeated.`);
-        endGame();
-        return;
-    }
-
-    updateUI();
-    disableControls(false);
+function openSupport() {
+  alert("ISC ENTERPRISE Support: Contact us on WhatsApp at 024 000 0000.");
 }
 
-function disableControls(disabled) {
-    const buttons = document.querySelectorAll('.control-panel button');
-    buttons.forEach(btn => btn.disabled = disabled);
-}
-
-function endGame() {
-    isGameOver = true;
-    disableControls(true);
-    document.getElementById('restart-btn').style.display = 'block';
-}
-
-function restartGame() {
-    heroHp = heroMaxHp;
-    enemyHp = enemyMaxHp;
-    isGameOver = false;
-    document.getElementById('restart-btn').style.display = 'none';
-    document.getElementById('battle-log').innerHTML = `<p>A new battle begins! Choose your move.</p>`;
-    updateUI();
-    disableControls(false);
-}
+document.getElementById("ordersBtn").addEventListener("click", scrollToOrders);
+document.getElementById("transactionsBtn").addEventListener("click", scrollToOrders);
+document.getElementById("menuBtn").addEventListener("click", scrollToOrders);
+document.getElementById("helpBtn").addEventListener("click", openSupport);
+document.getElementById("chatBtn").addEventListener("click", openSupport);
+document.getElementById("communityBtn").addEventListener("click", () => {
+  alert("Community link coming soon!");
+});
+ 
