@@ -1,124 +1,371 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #0f172a, #1e293b);
-    color: #f8fafc;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
+  background-color: #f3f4f6;
+  color: #1f2937;
+  padding-bottom: 80px;
 }
 
-.game-container {
-    background: rgba(30, 41, 59, 0.85);
-    backdrop-filter: blur(10px);
-    padding: 2rem;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    width: 90%;
-    max-width: 450px;
-    text-align: center;
+/* Navbar */
+.navbar {
+  background: #ffffff;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-h1 {
-    margin-top: 0;
-    color: #38bdf8;
-    font-size: 1.8rem;
-    letter-spacing: 0.5px;
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-.battle-arena {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 1.5rem 0;
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  color: #111827;
 }
 
-.fighter-card {
-    background: rgba(15, 23, 42, 0.6);
-    padding: 1rem;
-    border-radius: 12px;
-    width: 40%;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+.brand-name strong {
+  color: #f59e0b;
 }
 
-.fighter-card h3 {
-    margin: 0 0 8px 0;
-    color: #34d399;
-    font-size: 1.1rem;
+.community-btn {
+  background-color: #10b981;
+  color: white;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
-.hp-bar-container {
-    background: #0f172a;
-    border-radius: 6px;
-    height: 12px;
-    overflow: hidden;
-    margin-bottom: 6px;
+.menu-btn {
+  background-color: #f59e0b;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
 }
 
-.hp-bar {
-    background: linear-gradient(90deg, #34d399, #10b981);
-    height: 100%;
-    width: 100%;
-    transition: width 0.4s ease;
+/* Main Layout */
+.container {
+  max-width: 960px;
+  margin: 20px auto;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.vs {
-    font-weight: bold;
-    font-size: 1.2rem;
-    color: #f43f5e;
+/* Gold Hero Card */
+.hero-card {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  border-radius: 16px;
+  padding: 24px;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
 }
 
-#battle-log {
-    background: rgba(15, 23, 42, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    padding: 0.8rem;
-    height: 80px;
-    overflow-y: auto;
-    text-align: left;
-    font-size: 0.9rem;
-    margin-bottom: 1.5rem;
-    color: #cbd5e1;
+.hero-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
 }
 
-.control-panel {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 12px;
+.hero-top h1 {
+  font-size: 21px;
+  margin-bottom: 4px;
 }
 
-.control-panel button, #restart-btn {
-    background: linear-gradient(135deg, #0ea5e9, #0284c7);
-    color: white;
-    border: none;
-    padding: 12px;
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: transform 0.1s ease, background 0.2s ease;
-    touch-action: manipulation;
+.subtitle {
+  font-size: 14px;
+  opacity: 0.95;
+  margin-bottom: 10px;
 }
 
-.control-panel button:hover, #restart-btn:hover {
-    background: linear-gradient(135deg, #0284c7, #0369a1);
-    transform: translateY(-1px);
+.badge-dark {
+  display: inline-block;
+  background-color: #1f2937;
+  color: #ffffff;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 999px;
 }
 
-.control-panel button:active, #restart-btn:active {
-    transform: translateY(1px);
+.circle-icon {
+  background: #ffffff;
+  color: #f59e0b;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-#restart-btn {
-    width: 100%;
-    background: linear-gradient(135deg, #f43f5e, #e11d48);
-    margin-top: 12px;
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  margin: 18px 0;
 }
 
-#restart-btn:hover {
-    background: linear-gradient(135deg, #e11d48, #be123c);
+.btn-dark {
+  background-color: #1f2937;
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
+.hero-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  padding-top: 14px;
+  font-size: 13px;
+}
 
+.perks {
+  display: flex;
+  gap: 14px;
+}
+
+.help-pill {
+  background: rgba(0, 0, 0, 0.15);
+  color: #ffffff;
+  text-decoration: none;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+/* White Cards */
+.white-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.white-card h2 {
+  font-size: 17px;
+  margin-bottom: 16px;
+}
+
+/* Network Selector Grid */
+.network-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.network-box {
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.network-box:active {
+  transform: scale(0.97);
+}
+
+.mtn-box {
+  background-color: #fef9c3;
+  border: 1px solid #fde047;
+}
+
+.telecel-box {
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+}
+
+.network-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+.mtn-circle {
+  background-color: #facc15;
+  color: #111827;
+  font-size: 13px;
+}
+
+.telecel-circle {
+  background-color: #ef4444;
+  color: #ffffff;
+  font-size: 22px;
+}
+
+.network-box p {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Order Modal Popup */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 50;
+}
+
+.modal-box {
+  background: #ffffff;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.close-btn {
+  background: #f3f4f6;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.form-group select,
+.form-group input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.submit-btn {
+  width: 100%;
+  background-color: #f59e0b;
+  color: #ffffff;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 6px;
+}
+
+/* Recent Orders List */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.card-header h2 {
+  margin-bottom: 0;
+}
+
+.view-all {
+  color: #f59e0b;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.empty-text {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.order-info strong {
+  display: block;
+  font-size: 14px;
+}
+
+.order-info span {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.status-badge {
+  background-color: #d1fae5;
+  color: #065f46;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+/* Floating Chat */
+.floating-chat {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #7c3aed;
+  color: white;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
+    }
