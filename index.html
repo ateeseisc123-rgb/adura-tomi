@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ISC ENTERPRISE - Data Bundles</title>
+  <!-- Clean Modern Font -->
+  <link rel="preconnect" href="https://googleapis.com">
+  <link rel="preconnect" href="https://gstatic.com" crossorigin>
+  <link href="https://googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -12,15 +16,28 @@
   <nav class="navbar">
     <div class="nav-left">
       <div class="brand-logo">
-        <span class="logo-icon">📊</span>
+        <!-- Insert your custom logo image below later -->
+        <!-- <img src="logo.png" alt="ISC ENTERPRISE Logo" class="custom-logo" /> -->
         <span class="brand-name">ISC <strong>ENTERPRISE</strong></span>
       </div>
-      <a href="#" class="community-btn" id="communityBtn">🔔 Join Community</a>
+      <a href="#footer-contact" class="community-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Join Community
+      </a>
     </div>
     <div class="nav-right">
-      <button class="menu-btn" id="menuBtn">☰</button>
+      <button class="menu-btn" id="menuBtn" aria-label="Menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
     </div>
   </nav>
+
+  <!-- Dropdown Menu (Hidden by default) -->
+  <div class="dropdown-menu" id="dropdownMenu">
+    <a href="#" id="menuNewOrder">Place New Order</a>
+    <a href="#orders-section" id="menuOrders">Recent Orders</a>
+    <a href="#footer-contact" id="menuContact">Contact & Support</a>
+  </div>
 
   <!-- Main Container -->
   <main class="container">
@@ -29,27 +46,46 @@
     <section class="hero-card">
       <div class="hero-top">
         <div>
-          <h1>Mema wo akye, Welcome! 👋</h1>
+          <h1>Mema wo akye, Welcome!</h1>
           <p class="subtitle">Welcome to ISC ENTERPRISE</p>
           <span class="badge-dark">Fast & Reliable Data</span>
         </div>
         <div class="profile-icons">
-          <span class="circle-icon">👤</span>
+          <span class="circle-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>
         </div>
       </div>
 
       <div class="action-buttons">
-        <button class="btn-dark" id="ordersBtn">🕒 Orders</button>
-        <button class="btn-dark" id="transactionsBtn">📄 Transactions</button>
+        <button class="btn-dark" id="ordersBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Orders
+        </button>
+        <button class="btn-dark" id="transactionsBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Transactions
+        </button>
       </div>
 
       <div class="hero-footer">
         <div class="perks">
-          <span>⚡ Instant</span>
-          <span>🛡️ Secure</span>
-          <span>🕒 24/7</span>
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Instant
+          </span>
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Secure
+          </span>
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            24/7
+          </span>
         </div>
-        <a href="#" class="help-pill" id="helpBtn">🎧 Need Help ›</a>
+        <a href="#footer-contact" class="help-pill" id="helpBtn">
+          Need Help ›
+        </a>
       </div>
     </section>
 
@@ -58,12 +94,12 @@
       <h2>Place New Order</h2>
       <div class="network-grid">
         
-        <div class="network-box mtn-box" onclick="openOrderModal('MTN')">
+        <div class="network-box mtn-box" id="selectMtn">
           <div class="network-circle mtn-circle">MTN</div>
           <p>MTN</p>
         </div>
 
-        <div class="network-box telecel-box" onclick="openOrderModal('Telecel')">
+        <div class="network-box telecel-box" id="selectTelecel">
           <div class="network-circle telecel-circle">t</div>
           <p>Telecel</p>
         </div>
@@ -75,7 +111,7 @@
     <section class="white-card" id="orders-section">
       <div class="card-header">
         <h2>Recent Orders</h2>
-        <a href="#orders-section" class="view-all">View All ›</a>
+        <button class="view-all-btn" id="clearOrdersBtn">Clear History</button>
       </div>
       <div id="ordersList">
         <p class="empty-text">No recent orders yet. Select MTN or Telecel above to buy data.</p>
@@ -83,6 +119,40 @@
     </section>
 
   </main>
+
+  <!-- 5. Footer Contact Information -->
+  <footer class="site-footer" id="footer-contact">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <h3>ISC <strong>ENTERPRISE</strong></h3>
+        <p>Fast, affordable, and reliable mobile data bundles across Ghana.</p>
+      </div>
+
+      <div class="footer-links">
+        <h4>Contact & Support</h4>
+        <ul>
+          <li>
+            <strong>Phone:</strong> 
+            <a href="tel:+233000000000">+233 00 000 0000</a>
+          </li>
+          <li>
+            <strong>WhatsApp:</strong> 
+            <a href="https://wa.me" target="_blank">Chat on WhatsApp</a>
+          </li>
+          <li>
+            <strong>Email:</strong> 
+            <a href="mailto:info@iscenterprise.com">info@iscenterprise.com</a>
+          </li>
+          <li>
+            <strong>Location:</strong> Ghana
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 ISC ENTERPRISE. All rights reserved.</p>
+    </div>
+  </footer>
 
   <!-- Popup Order Form Modal -->
   <div class="modal-overlay" id="orderModal">
@@ -108,9 +178,12 @@
     </div>
   </div>
 
-  <!-- Floating Chat Button -->
-  <button class="floating-chat" id="chatBtn" title="Support">💬</button>
+  <!-- Floating Support Button -->
+  <button class="floating-chat" id="chatBtn" aria-label="Chat Support">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  </button>
 
   <script src="script.js"></script>
 </body>
-</html>
+  </html>
+  
