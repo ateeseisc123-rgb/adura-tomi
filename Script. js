@@ -1,100 +1,133 @@
-const packages = {
-  MTN: [
-    "1 GB — GHS 5.00",
-    "2 GB — GHS 9.50",
-    "3 GB — GHS 13.50",
-    "5 GB — GHS 22.00",
-    "10 GB — GHS 42.00"
-  ],
-  Telecel: [
-    "2 GB — GHS 9.00",
-    "5 GB — GHS 20.00",
-    "10 GB — GHS 38.00",
-    "15 GB — GHS 55.00"
-  ]
-};
+ document.addEventListener("DOMContentLoaded", () => {
+  const packages = {
+    MTN: [
+      "1 GB — GHS 5.00",
+      "2 GB — GHS 9.50",
+      "3 GB — GHS 13.50",
+      "5 GB — GHS 22.00",
+      "10 GB — GHS 42.00"
+    ],
+    Telecel: [
+      "2 GB — GHS 9.00",
+      "5 GB — GHS 20.00",
+      "10 GB — GHS 38.00",
+      "15 GB — GHS 55.00"
+    ]
+  };
 
-let selectedNetwork = "";
-const orders = [];
+  let selectedNetwork = "";
+  const orders = [];
 
-const modal = document.getElementById("orderModal");
-const modalTitle = document.getElementById("modalTitle");
-const bundleSelect = document.getElementById("bundleSelect");
-const bundleForm = document.getElementById("bundleForm");
-const ordersList = document.getElementById("ordersList");
+  const modal = document.getElementById("orderModal");
+  const modalTitle = document.getElementById("modalTitle");
+  const bundleSelect = document.getElementById("bundleSelect");
+  const bundleForm = document.getElementById("bundleForm");
+  const ordersList = document.getElementById("ordersList");
+  const dropdownMenu = document.getElementById("dropdownMenu");
 
-function openOrderModal(network) {
-  selectedNetwork = network;
-  modalTitle.textContent = `Buy ${network} Data`;
+  // Open Order Modal
+  function openOrderModal(network) {
+    selectedNetwork = network;
+    modalTitle.textContent = `Buy ${network} Data`;
 
-  bundleSelect.innerHTML = "";
-  packages[network].forEach(pkg => {
-    const option = document.createElement("option");
-    option.value = pkg;
-    option.textContent = pkg;
-    bundleSelect.appendChild(option);
-  });
+    bundleSelect.innerHTML = "";
+    packages[network].forEach(pkg => {
+      const option = document.createElement("option");
+      option.value = pkg;
+      option.textContent = pkg;
+      bundleSelect.appendChild(option);
+    });
 
-  modal.style.display = "flex";
-}
-
-function closeOrderModal() {
-  modal.style.display = "none";
-  bundleForm.reset();
-}
-
-document.getElementById("closeModalBtn").addEventListener("click", closeOrderModal);
-
-bundleForm.addEventListener("submit", function(event) {
-  event.preventDefault();
-
-  const chosenBundle = bundleSelect.value;
-  const phone = document.getElementById("recipientPhone").value.trim();
-
-  if (phone.length < 10) {
-    alert("Please enter a valid 10-digit Ghana phone number.");
-    return;
+    modal.style.display = "flex";
   }
 
-  orders.unshift({
-    network: selectedNetwork,
-    bundle: chosenBundle,
-    phone: phone,
-    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  function closeOrderModal() {
+    modal.style.display = "none";
+    bundleForm.reset();
+  }
+
+  // Network Box Click Listeners
+  document.getElementById("selectMtn").addEventListener("click", () => openOrderModal("MTN"));
+  document.getElementById("selectTelecel").addEventListener("click", () => openOrderModal("Telecel"));
+  document.getElementById("closeModalBtn").addEventListener("click", closeOrderModal);
+
+  // Close modal if user taps outside the white box
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeOrderModal();
   });
 
-  renderOrders();
-  closeOrderModal();
-  alert(`Order placed for ${selectedNetwork} (${chosenBundle}) to ${phone}!`);
-});
+  // Handle Order Form Submit
+  bundleForm.addEventListener("submit", (event) => {
+    event.preventDefault();
 
-function renderOrders() {
-  if (orders.length === 0) return;
+    const chosenBundle = bundleSelect.value;
+    const phone = document.getElementById("recipientPhone").value.trim();
 
-  ordersList.innerHTML = orders.map(order => `
-    <div class="order-item">
-      <div class="order-info">
-        <strong>${order.network} • ${order.bundle}</strong>
-        <span>To: ${order.phone} • ${order.time}</span>
+    if (phone.length < 10) {
+      alert("Please enter a valid 10-digit Ghana phone number.");
+      return;
+    }
+
+    orders.unshift({
+      network: selectedNetwork,
+      bundle: chosenBundle,
+      phone: phone,
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    });
+
+    renderOrders();
+    closeOrderModal();
+    document.getElementById("orders-section").scrollIntoView({ behavior: "smooth" });
+  });
+
+  // Render Orders List
+  function renderOrders() {
+    if (orders.length === 0) {
+      ordersList.innerHTML = `<p class="empty-text">No recent orders yet. Select MTN or Telecel above to buy data.</p>`;
+      return;
+    }
+
+    ordersList.innerHTML = orders.map(order => `
+      <div class="order-item">
+        <div class="order-info">
+          <strong>${order.network} • ${order.bundle}</strong>
+          <span>To: ${order.phone} • ${order.time}</span>
+        </div>
+        <span class="status-badge">Pending</span>
       </div>
-      <span class="status-badge">Pending</span>
-    </div>
-  `).join("");
-}
+    `).join("");
+  }
 
-function scrollToOrders() {
-  document.getElementById("orders-section").scrollIntoView({ behavior: "smooth" });
-}
+  // Clear Orders Button
+  document.getElementById("clearOrdersBtn").addEventListener("click", () => {
+    orders.length = 0;
+    renderOrders();
+  });
 
-function openSupport() {
-  alert("ISC ENTERPRISE Support: Contact us on WhatsApp at 024 000 0000.");
-}
+  // Top Menu Toggle
+  document.getElementById("menuBtn").addEventListener("click", () => {
+    dropdownMenu.classList.toggle("show");
+  });
 
-document.getElementById("ordersBtn").addEventListener("click", scrollToOrders);
-document.getElementById("transactionsBtn").addEventListener("click", scrollToOrders);
-document.getElementById("menuBtn").addEventListener("click", scrollToOrders);
-document.getElementById("helpBtn").addEventListener("click", openSupport);
-document.getElementById("chatBtn").addEventListener("click", openSupport);
-document.getElementById("communityBtn").addEventListener("click", () => {
-  alert("Community link coming soon!");
+  // Close dropdown when clicking links inside it
+  dropdownMenu.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", () => dropdownMenu.classList.remove("show"));
+  });
+
+  // Navigation & Action Buttons
+  const scrollToOrders = () => {
+    document.getElementById("orders-section").scrollIntoView({ behavior: "smooth" });
+  };
+
+  const scrollToFooter = () => {
+    document.getElementById("footer-contact").scrollIntoView({ behavior: "smooth" });
+  };
+
+  document.getElementById("ordersBtn").addEventListener("click", scrollToOrders);
+  document.getElementById("transactionsBtn").addEventListener("click", scrollToOrders);
+  document.getElementById("chatBtn").addEventListener("click", scrollToFooter);
+  document.getElementById("menuNewOrder").addEventListener("click", (e) => {
+    e.preventDefault();
+    openOrderModal("MTN");
+  });
 });
