@@ -1,0 +1,100 @@
+const packages = {
+  MTN: [
+    "1 GB — GHS 5.00",
+    "2 GB — GHS 9.50",
+    "3 GB — GHS 13.50",
+    "5 GB — GHS 22.00",
+    "10 GB — GHS 42.00"
+  ],
+  Telecel: [
+    "2 GB — GHS 9.00",
+    "5 GB — GHS 20.00",
+    "10 GB — GHS 38.00",
+    "15 GB — GHS 55.00"
+  ]
+};
+
+let selectedNetwork = "";
+const orders = [];
+
+const modal = document.getElementById("orderModal");
+const modalTitle = document.getElementById("modalTitle");
+const bundleSelect = document.getElementById("bundleSelect");
+const bundleForm = document.getElementById("bundleForm");
+const ordersList = document.getElementById("ordersList");
+
+function openOrderModal(network) {
+  selectedNetwork = network;
+  modalTitle.textContent = `Buy ${network} Data`;
+
+  bundleSelect.innerHTML = "";
+  packages[network].forEach(pkg => {
+    const option = document.createElement("option");
+    option.value = pkg;
+    option.textContent = pkg;
+    bundleSelect.appendChild(option);
+  });
+
+  modal.style.display = "flex";
+}
+
+function closeOrderModal() {
+  modal.style.display = "none";
+  bundleForm.reset();
+}
+
+document.getElementById("closeModalBtn").addEventListener("click", closeOrderModal);
+
+bundleForm.addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  const chosenBundle = bundleSelect.value;
+  const phone = document.getElementById("recipientPhone").value.trim();
+
+  if (phone.length < 10) {
+    alert("Please enter a valid 10-digit Ghana phone number.");
+    return;
+  }
+
+  orders.unshift({
+    network: selectedNetwork,
+    bundle: chosenBundle,
+    phone: phone,
+    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  });
+
+  renderOrders();
+  closeOrderModal();
+  alert(`Order placed for ${selectedNetwork} (${chosenBundle}) to ${phone}!`);
+});
+
+function renderOrders() {
+  if (orders.length === 0) return;
+
+  ordersList.innerHTML = orders.map(order => `
+    <div class="order-item">
+      <div class="order-info">
+        <strong>${order.network} • ${order.bundle}</strong>
+        <span>To: ${order.phone} • ${order.time}</span>
+      </div>
+      <span class="status-badge">Pending</span>
+    </div>
+  `).join("");
+}
+
+function scrollToOrders() {
+  document.getElementById("orders-section").scrollIntoView({ behavior: "smooth" });
+}
+
+function openSupport() {
+  alert("ISC ENTERPRISE Support: Contact us on WhatsApp at 024 000 0000.");
+}
+
+document.getElementById("ordersBtn").addEventListener("click", scrollToOrders);
+document.getElementById("transactionsBtn").addEventListener("click", scrollToOrders);
+document.getElementById("menuBtn").addEventListener("click", scrollToOrders);
+document.getElementById("helpBtn").addEventListener("click", openSupport);
+document.getElementById("chatBtn").addEventListener("click", openSupport);
+document.getElementById("communityBtn").addEventListener("click", () => {
+  alert("Community link coming soon!");
+});
