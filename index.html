@@ -6,7 +6,7 @@
   <title>ISC ENTERPRISE - Data Bundles</title>
   <link rel="preconnect" href="https://googleapis.com">
   <link rel="preconnect" href="https://gstatic.com" crossorigin>
-  <link href="https://googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://googleapis.com" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -14,9 +14,7 @@
   <!-- 1. Top Navbar -->
   <nav class="navbar">
     <div class="nav-left">
-      <div class="brand-logo">
-        <!-- Insert your custom logo image below later -->
-        <!-- <img src="logo.png" alt="ISC ENTERPRISE Logo" class="custom-logo" /> -->
+      <div class="brand-logo" id="brandHomeBtn" style="cursor: pointer;">
         <span class="brand-name">ISC <strong>ENTERPRISE</strong></span>
       </div>
       <a href="https://wa.me" target="_blank" class="community-btn">
@@ -32,89 +30,156 @@
     </div>
   </nav>
 
-  <!-- Dropdown Menu -->
-  <div class="dropdown-menu" id="dropdownMenu">
-    <a href="#" id="menuNewOrder">Place New Order</a>
-    <a href="#orders-section" id="menuOrders">Recent Orders</a>
-    <a href="#leaderboard-section" id="menuLeaderboard">Top Customers</a>
-    <a href="#footer-contact" id="menuContact">Contact & Support</a>
-    <a href="#" id="menuLogout" style="display: none; color: #dc2626;">Logout</a>
-  </div>
+  <!-- Blurred Dark Overlay & Slide-Out Drawer Menu -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <aside class="side-drawer" id="sideDrawer">
+    <div class="drawer-header">
+      <h3>Menu</h3>
+      <button class="drawer-close-btn" id="closeDrawerBtn">&times;</button>
+    </div>
+
+    <!-- User Profile Card -->
+    <div class="drawer-profile-card" id="drawerProfileCard">
+      <div class="drawer-avatar">👤</div>
+      <div class="drawer-profile-info">
+        <strong id="drawerUserName">ISC GUEST</strong>
+        <span id="drawerProfileSub">Tap to Login / Sign Up</span>
+      </div>
+      <span class="drawer-arrow">&rsaquo;</span>
+    </div>
+
+    <ul class="drawer-list">
+      <li><a href="#" id="menuDashboard"><span class="d-icon yellow">🏠</span> Dashboard <span class="drawer-arrow">&rsaquo;</span></a></li>
+    </ul>
+
+    <div class="drawer-section-title">BUY DATA</div>
+    <ul class="drawer-list">
+      <li><a href="#" id="menuMtn"><span class="d-badge mtn">MTN</span> MTN Data <span class="drawer-arrow">&rsaquo;</span></a></li>
+      <li><a href="#" id="menuAirtelTigo"><span class="d-badge at">at</span> AirtelTigo <span class="drawer-arrow">&rsaquo;</span></a></li>
+      <li><a href="#" id="menuTelecel"><span class="d-badge telecel">t</span> Telecel <span class="drawer-arrow">&rsaquo;</span></a></li>
+    </ul>
+
+    <div class="drawer-section-title">MORE SERVICES</div>
+    <ul class="drawer-list">
+      <li><a href="#orders-section" id="menuOrders"><span class="d-icon blue">🧾</span> Recent Orders <span class="drawer-arrow">&rsaquo;</span></a></li>
+      <li><a href="#leaderboard-section" id="menuLeaderboard"><span class="d-icon orange">🏆</span> Top Customers <span class="drawer-arrow">&rsaquo;</span></a></li>
+      <li><a href="#footer-contact" id="menuContact"><span class="d-icon green">💬</span> Contact & Support <span class="drawer-arrow">&rsaquo;</span></a></li>
+    </ul>
+
+    <div class="drawer-theme-row">
+      <span>☀️ Dark Dashboard Mode</span>
+      <label class="switch">
+        <input type="checkbox" id="darkModeToggle">
+        <span class="slider round"></span>
+      </label>
+    </div>
+
+    <button class="drawer-logout-btn" id="menuLogout" style="display: none;">Sign Out</button>
+    <p class="drawer-footer-copy">ISC ENTERPRISE &copy; 2026</p>
+  </aside>
 
   <!-- Main Container -->
   <main class="container">
 
-    <!-- 2. Gold Hero Welcome Card -->
-    <section class="hero-card">
-      <div class="hero-top">
-        <div>
-          <h1 id="welcomeHeading">Mema wo akye, Welcome!</h1>
-          <p class="subtitle">Welcome to ISC ENTERPRISE</p>
-          <span class="badge-dark" id="userPointsBadge">Sign in to earn loyalty points</span>
+    <!-- ================= HOME DASHBOARD VIEW ================= -->
+    <div id="homeDashboardView">
+      <!-- 2. Gold Hero Welcome Card with Automatic Greeting -->
+      <section class="hero-card">
+        <div class="hero-top">
+          <div>
+            <h1 id="welcomeHeading">Mema wo akye, Welcome!</h1>
+            <p class="subtitle" id="welcomeSubtitle">Good Morning! Welcome to ISC ENTERPRISE</p>
+            <span class="badge-dark" id="userPointsBadge">Sign in to earn loyalty points</span>
+          </div>
+          <div class="profile-icons">
+            <button class="circle-icon" id="profileIconBtn" title="Account">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </button>
+          </div>
         </div>
-        <div class="profile-icons">
-          <button class="circle-icon" id="profileIconBtn" title="Account">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+
+        <div class="action-buttons">
+          <button class="btn-dark" id="ordersBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Orders
+          </button>
+          <button class="btn-dark" id="transactionsBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Leaderboard
           </button>
         </div>
-      </div>
 
-      <div class="action-buttons">
-        <button class="btn-dark" id="ordersBtn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          Orders
-        </button>
-        <button class="btn-dark" id="transactionsBtn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          Leaderboard
-        </button>
-      </div>
-
-      <div class="hero-footer">
-        <div class="perks">
-          <span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            Instant
-          </span>
-          <span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            Secure
-          </span>
-          <span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            24/7
-          </span>
+        <div class="hero-footer">
+          <div class="perks">
+            <span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Instant
+            </span>
+            <span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Secure
+            </span>
+            <span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              24/7
+            </span>
+          </div>
+          <a href="#footer-contact" class="help-pill" id="helpBtn">
+            Need Help ›
+          </a>
         </div>
-        <a href="#footer-contact" class="help-pill" id="helpBtn">
-          Need Help ›
-        </a>
-      </div>
-    </section>
+      </section>
 
-    <!-- 3. Place New Order (MTN & Telecel Only) -->
-    <section class="white-card">
-      <h2>Place New Order</h2>
-      <div class="network-grid">
-        <div class="network-box mtn-box" id="selectMtn">
-          <div class="network-circle mtn-circle">MTN</div>
-          <p>MTN</p>
-        </div>
+      <!-- 3. Place New Order (MTN, AirtelTigo & Telecel) -->
+      <section class="white-card" style="margin-top: 20px;">
+        <h2>Place New Order</h2>
+        <div class="network-grid three-cols">
+          <div class="network-box mtn-box" id="selectMtn">
+            <div class="network-circle mtn-circle">MTN</div>
+            <p>MTN</p>
+          </div>
 
-        <div class="network-box telecel-box" id="selectTelecel">
-          <div class="network-circle telecel-circle">t</div>
-          <p>Telecel</p>
+          <div class="network-box at-box" id="selectAirtelTigo">
+            <div class="network-circle at-circle">at</div>
+            <p>AirtelTigo</p>
+          </div>
+
+          <div class="network-box telecel-box" id="selectTelecel">
+            <div class="network-circle telecel-circle">t</div>
+            <p>Telecel</p>
+          </div>
         </div>
+      </section>
+    </div>
+
+    <!-- ================= NETWORK BUNDLE GRID VIEW (Opens on MTN / AT / Telecel Tap) ================= -->
+    <section id="networkStoreView" class="network-store-view" style="display: none;">
+      <div class="store-top-bar">
+        <button class="back-dash-btn" id="backToDashboardBtn">&larr; Back to Dashboard</button>
+        <span class="store-network-label" id="storeNetworkTitle">MTN Data Bundles</span>
       </div>
+
+      <!-- DataMart Style Tabs -->
+      <div class="store-tabs">
+        <button class="store-tab active" id="tabStandardBundles">Data Bundles</button>
+        <button class="store-tab" id="tabPromoBundles">MashUp / Special</button>
+      </div>
+
+      <!-- 2-Column DataMart Bundle Cards -->
+      <div class="datamart-bundle-grid" id="datamartBundleGrid"></div>
     </section>
 
     <!-- 4. Recent Orders -->
     <section class="white-card" id="orders-section">
       <div class="card-header">
         <h2>Recent Orders</h2>
-        <span class="badge-subtle" id="orderCountBadge">0 Orders</span>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <span class="badge-subtle" id="orderCountBadge">0 Orders</span>
+          <button id="clearOrdersBtn" class="clear-mini-btn">Clear</button>
+        </div>
       </div>
       <div id="ordersList">
-        <p class="empty-text">Log in to view and save your data orders.</p>
+        <p class="empty-text">Log in or place an order to view your data bundles here.</p>
       </div>
     </section>
 
@@ -157,84 +222,4 @@
           <li><strong>Phone:</strong> <a href="tel:0550698143">0550698143</a></li>
           <li><strong>WhatsApp:</strong> <a href="https://wa.me" target="_blank">0550698143 (Chat on WhatsApp)</a></li>
           <li><strong>Email:</strong> <a href="mailto:ateeseisc123@gmail.com">ateeseisc123@gmail.com</a></li>
-          <li><strong>Location:</strong> Ghana</li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>&copy; 2026 ISC ENTERPRISE. Managed by ATEESE ISAAC JUNIOR. All rights reserved.</p>
-    </div>
-  </footer>
-
-  <!-- Popup Order Form Modal -->
-  <div class="modal-overlay" id="orderModal">
-    <div class="modal-box">
-      <div class="modal-header">
-        <h3 id="modalTitle">Buy Data Bundle</h3>
-        <button class="close-btn" id="closeModalBtn">✕</button>
-      </div>
-      
-      <form id="bundleForm">
-        <div class="form-group">
-          <label for="bundleSelect">Choose Package:</label>
-          <select id="bundleSelect" required></select>
-        </div>
-
-        <div class="form-group">
-          <label for="recipientPhone">Recipient Phone Number:</label>
-          <input type="tel" id="recipientPhone" placeholder="e.g. 0241234567" maxlength="10" required />
-        </div>
-
-        <button type="submit" class="submit-btn" id="submitOrderBtn">Place Order</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Login / Sign Up Modal -->
-  <div class="modal-overlay" id="authModal">
-    <div class="modal-box">
-      <div class="modal-header">
-        <h3 id="authModalTitle">Login to ISC ENTERPRISE</h3>
-        <button class="close-btn" id="closeAuthBtn">✕</button>
-      </div>
-
-      <form id="authForm">
-        <div class="form-group" id="nameGroup" style="display: none;">
-          <label for="authName">Full Name:</label>
-          <input type="text" id="authName" placeholder="e.g. Kwame Mensah" />
-        </div>
-
-        <div class="form-group" id="phoneGroup" style="display: none;">
-          <label for="authPhone">Phone Number:</label>
-          <input type="tel" id="authPhone" placeholder="e.g. 0550000000" maxlength="10" />
-        </div>
-
-        <div class="form-group">
-          <label for="authEmail">Email Address:</label>
-          <input type="email" id="authEmail" placeholder="you@example.com" required />
-        </div>
-
-        <div class="form-group">
-          <label for="authPassword">Password (min 6 characters):</label>
-          <input type="password" id="authPassword" placeholder="••••••••" minlength="6" required />
-        </div>
-
-        <button type="submit" class="submit-btn" id="authSubmitBtn">Login</button>
-      </form>
-
-      <p class="auth-switch-text">
-        <span id="authSwitchPrompt">Don't have an account?</span>
-        <button type="button" class="link-btn" id="toggleAuthModeBtn">Create Account</button>
-      </p>
-    </div>
-  </div>
-
-  <!-- Floating Support Button -->
-  <button class="floating-chat" id="chatBtn" aria-label="Chat Support">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-  </button>
-
-  <script type="module" src="script.js"></script>
-</body>
-  </html>
-  
+                                                                                                          
