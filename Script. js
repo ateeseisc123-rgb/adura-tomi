@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // 1. Packages Data
   const packages = {
     MTN: [
       { size: "1GB", label: "1 GB — GHS 5.00", price: "₵5.00" },
@@ -25,7 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let selectedNetwork = "MTN";
   const orders = [];
 
-  // 2. Automatic Time-Based Greeting (Morning / Afternoon / Evening)
   function updateGreeting(userName = "Welcome") {
     const hour = new Date().getHours();
     let twiGreeting = "Mema wo akye";
@@ -48,7 +46,6 @@ document.addEventListener("DOMContentLoaded", () => {
   updateGreeting();
   setInterval(() => updateGreeting(), 60000);
 
-  // 3. Slide-Out Drawer Menu Logic
   const menuBtn = document.getElementById("menuBtn");
   const closeDrawerBtn = document.getElementById("closeDrawerBtn");
   const sideDrawer = document.getElementById("sideDrawer");
@@ -68,7 +65,6 @@ document.addEventListener("DOMContentLoaded", () => {
   closeDrawerBtn.addEventListener("click", closeDrawer);
   drawerOverlay.addEventListener("click", closeDrawer);
 
-  // Dark Mode Switch inside Drawer
   const darkModeToggle = document.getElementById("darkModeToggle");
   if (darkModeToggle) {
     darkModeToggle.addEventListener("change", (e) => {
@@ -76,7 +72,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 4. DataMart Network Bundle View Switcher
   const homeDashboardView = document.getElementById("homeDashboardView");
   const networkStoreView = document.getElementById("networkStoreView");
   const storeNetworkTitle = document.getElementById("storeNetworkTitle");
@@ -130,8 +125,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("selectTelecel").addEventListener("click", () => showNetworkBundles("Telecel"));
   document.getElementById("backToDashboardBtn").addEventListener("click", showHomeDashboard);
   document.getElementById("brandHomeBtn").addEventListener("click", showHomeDashboard);
-
-  // Drawer Menu Navigation Links
   document.getElementById("menuDashboard").addEventListener("click", (e) => {
     e.preventDefault();
     showHomeDashboard();
@@ -160,7 +153,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("menuLeaderboard").addEventListener("click", () => closeDrawer());
   document.getElementById("menuContact").addEventListener("click", () => closeDrawer());
 
-  // 5. Order Modal & Recent Orders
   const modal = document.getElementById("orderModal");
   const modalTitle = document.getElementById("modalTitle");
   const bundleSelect = document.getElementById("bundleSelect");
@@ -252,7 +244,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 6. Auth Modal Open/Close Handlers
   const authModal = document.getElementById("authModal");
   const openAuthBtn = document.getElementById("openAuthBtn");
   const closeAuthBtn = document.getElementById("closeAuthBtn");
@@ -278,3 +269,24 @@ document.addEventListener("DOMContentLoaded", () => {
       isSignUpMode = !isSignUpMode;
       document.getElementById("nameGroup").style.display = isSignUpMode ? "block" : "none";
       document.getElementById("phoneGroup").style.display = isSignUpMode ? "block" : "none";
+      document.getElementById("authModalTitle").textContent = isSignUpMode
+        ? "Create ISC ENTERPRISE Account"
+        : "Login to ISC ENTERPRISE";
+      document.getElementById("authSubmitBtn").textContent = isSignUpMode ? "Create Account" : "Login";
+      document.getElementById("authSwitchPrompt").textContent = isSignUpMode
+        ? "Already have an account?"
+        : "Don't have an account?";
+      toggleAuthModeBtn.textContent = isSignUpMode ? "Login" : "Create Account";
+    });
+  }
+
+  document.getElementById("ordersBtn").addEventListener("click", () => {
+    document.getElementById("orders-section").scrollIntoView({ behavior: "smooth" });
+  });
+  document.getElementById("transactionsBtn").addEventListener("click", () => {
+    document.getElementById("leaderboard-section").scrollIntoView({ behavior: "smooth" });
+  });
+  document.getElementById("chatBtn").addEventListener("click", () => {
+    document.getElementById("footer-contact").scrollIntoView({ behavior: "smooth" });
+  });
+});
