@@ -1,477 +1,137 @@
-import { initializeApp } from "https://gstatic.com";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  updateProfile
-} from "https://gstatic.com";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  doc,
-  setDoc,
-  updateDoc,
-  increment,
-  query,
-  where,
-  orderBy,
-  limit,
-  onSnapshot,
-  serverTimestamp
-} from "https://gstatic.com";
-
-// ==========================================
-// 1. YOUR FIREBASE CONFIG (PASTE YOUR KEYS HERE)
-// ==========================================
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_://firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_://appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-// ==========================================
-// 2. BUNDLE CATALOG DATA (GHS)
-// ==========================================
-const BUNDLES = {
-  MTN: {
-    standard: [
-      { id: "mtn-1", size: "1 GB", price: 5.50, validity: "Non-Expiry" },
-      { id: "mtn-2", size: "2 GB", price: 10.50, validity: "Non-Expiry" },
-      { id: "mtn-3", size: "3 GB", price: 15.50, validity: "Non-Expiry" },
-      { id: "mtn-5", size: "5 GB", price: 24.50, validity: "Non-Expiry" },
-      { id: "mtn-10", size: "10 GB", price: 46.00, validity: "Non-Expiry" },
-      { id: "mtn-20", size: "20 GB", price: 88.00, validity: "Non-Expiry" }
-    ],
-    promo: [
-      { id: "mtn-p1", size: "1.5 GB", price: 7.50, validity: "No Expiry" },
-      { id: "mtn-p4", size: "4 GB", price: 19.50, validity: "No Expiry" },
-      { id: "mtn-p15", size: "15 GB", price: 67.00, validity: "No Expiry" }
-    ]
-  },
-  AirtelTigo: {
-    standard: [
-      { id: "at-1", size: "1 GB", price: 4.80, validity: "Non-Expiry" },
-      { id: "at-2", size: "2 GB", price: 9.20, validity: "Non-Expiry" },
-      { id: "at-4", size: "4 GB", price: 17.50, validity: "Non-Expiry" },
-      { id: "at-6", size: "6 GB", price: 25.00, validity: "Non-Expiry" },
-      { id: "at-10", size: "10 GB", price: 40.00, validity: "Non-Expiry" }
-    ],
-    promo: [
-      { id: "at-p3", size: "3 GB", price: 13.00, validity: "No Expiry" },
-      { id: "at-p8", size: "8 GB", price: 33.00, validity: "No Expiry" }
-    ]
-  },
-  Telecel: {
-    standard: [
-      { id: "tel-1", size: "1 GB", price: 5.00, validity: "Non-Expiry" },
-      { id: "tel-2", size: "2 GB", price: 9.80, validity: "Non-Expiry" },
-      { id: "tel-5", size: "5 GB", price: 22.00, validity: "Non-Expiry" },
-      { id: "tel-10", size: "10 GB", price: 42.00, validity: "Non-Expiry" }
-    ],
-    promo: [
-      { id: "tel-p3", size: "3 GB", price: 14.00, validity: "No Expiry" },
-      { id: "tel-p15", size: "15 GB", price: 60.00, validity: "No Expiry" }
-    ]
-  }
-};
-
-// ==========================================
-// 3. STATE & AUTOMATIC GHANA GREETING
-// ==========================================
-let currentNetwork = "MTN";
-let currentTab = "standard";
-let isSignupMode = false;
-let currentUser = null;
-let unsubscribeOrders = null;
-
-function getGhanaHour() {
-  const ghanaTime = new Date().toLocaleString("en-US", {
-    timeZone: "Africa/Accra",
-    hour: "numeric",
-    hour12: false
-  });
-  return parseInt(ghanaTime, 10);
-}
-
+// 1. TIME-BASED GREETING (Switches to Good evening at 5:00 PM)
 function updateGreeting() {
-  const hour = getGhanaHour();
-  const heading = document.getElementById("welcomeHeading");
-  const subtitle = document.getElementById("welcomeSubtitle");
-  const displayName = currentUser?.displayName || currentUser?.email?.split("@")[0] || "Welcome";
-  const firstName = displayName.split(" ")[0];
+  const hour = new Date().getHours();
+  const greetingElement = document.getElementById("greeting");
+  if (!greetingElement) return;
 
   if (hour >= 5 && hour < 12) {
-    heading.textContent = `Mema wo akyire, ${firstName}!`;
-    subtitle.textContent = "Good Morning! Welcome to ISC ENTERPRISE";
+    greetingElement.textContent = "Good morning";
   } else if (hour >= 12 && hour < 17) {
-    heading.textContent = `Mema wo aha, ${firstName}!`;
-    subtitle.textContent = "Good Afternoon! Welcome to ISC ENTERPRISE";
+    greetingElement.textContent = "Good afternoon";
   } else {
-    heading.textContent = `Mema wo adwo, ${firstName}!`;
-    subtitle.textContent = "Good Evening! Welcome to ISC ENTERPRISE";
+    greetingElement.textContent = "Good evening";
   }
 }
 
-updateGreeting();
-setInterval(updateGreeting, 30000);
+// 2. OUTFIT CATEGORY FILTER
+function filterOutfits(category) {
+  const cards = document.querySelectorAll(".product-card");
+  const buttons = document.querySelectorAll(".filter-btn");
 
-// ==========================================
-// 4. DARK MODE & SIDE DRAWER
-// ==========================================
-const darkModeToggle = document.getElementById("darkModeToggle");
-if (localStorage.getItem("isc_dark") === "true") {
-  document.body.classList.add("dark-theme");
-  darkModeToggle.checked = true;
-}
+  buttons.forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.category === category);
+  });
 
-darkModeToggle.addEventListener("change", () => {
-  document.body.classList.toggle("dark-theme", darkModeToggle.checked);
-  localStorage.setItem("isc_dark", darkModeToggle.checked);
-});
-
-const sideDrawer = document.getElementById("sideDrawer");
-const drawerOverlay = document.getElementById("drawerOverlay");
-
-function openDrawer() {
-  sideDrawer.classList.add("active");
-  drawerOverlay.classList.add("active");
-}
-
-function closeDrawer() {
-  sideDrawer.classList.remove("active");
-  drawerOverlay.classList.remove("active");
-}
-
-document.getElementById("menuBtn").addEventListener("click", openDrawer);
-document.getElementById("closeDrawerBtn").addEventListener("click", closeDrawer);
-drawerOverlay.addEventListener("click", closeDrawer);
-
-// ==========================================
-// 5. NETWORK STORE & BUNDLE RENDERER
-// ==========================================
-const homeDashboardView = document.getElementById("homeDashboardView");
-const networkStoreView = document.getElementById("networkStoreView");
-const storeNetworkTitle = document.getElementById("storeNetworkTitle");
-const bundleGrid = document.getElementById("datamartBundleGrid");
-
-function openNetworkStore(network) {
-  currentNetwork = network;
-  currentTab = "standard";
-  document.getElementById("tabStandardBundles").classList.add("active");
-  document.getElementById("tabPromoBundles").classList.remove("active");
-
-  storeNetworkTitle.textContent = `${network} Data Bundles`;
-  homeDashboardView.style.display = "none";
-  networkStoreView.style.display = "block";
-  renderBundles();
-  closeDrawer();
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-function showDashboard() {
-  networkStoreView.style.display = "none";
-  homeDashboardView.style.display = "block";
-  closeDrawer();
-}
-
-function renderBundles() {
-  const list = BUNDLES[currentNetwork][currentTab];
-  bundleGrid.innerHTML = "";
-
-  const cardClass =
-    currentNetwork === "Telecel"
-      ? "telecel-card"
-      : currentNetwork === "AirtelTigo"
-      ? "at-card"
-      : "";
-
-  list.forEach((item) => {
-    const card = document.createElement("div");
-    card.className = `dm-bundle-card ${cardClass}`;
-    card.innerHTML = `
-      <div>
-        <span class="dm-mini-badge">${currentNetwork}</span>
-        <div class="dm-size">${item.size}</div>
-        <div class="dm-sub">Instant Delivery</div>
-      </div>
-      <div class="dm-card-bottom">
-        <span class="dm-price">GHS ${item.price.toFixed(2)}</span>
-        <span class="dm-expiry">${item.validity}</span>
-      </div>
-    `;
-    card.addEventListener("click", () => openOrderModal(currentNetwork, item.id));
-    bundleGrid.appendChild(card);
+  cards.forEach((card) => {
+    if (category === "all" || card.dataset.category === category) {
+      card.style.display = "block";
+    } else {
+      card.style.display = "none";
+    }
   });
 }
-document.getElementById("selectMtn").addEventListener("click", () => openNetworkStore("MTN"));
-document.getElementById("selectAirtelTigo").addEventListener("click", () => openNetworkStore("AirtelTigo"));
-document.getElementById("selectTelecel").addEventListener("click", () => openNetworkStore("Telecel"));
 
-document.getElementById("menuMtn").addEventListener("click", (e) => { e.preventDefault(); openNetworkStore("MTN"); });
-document.getElementById("menuAirtelTigo").addEventListener("click", (e) => { e.preventDefault(); openNetworkStore("AirtelTigo"); });
-document.getElementById("menuTelecel").addEventListener("click", (e) => { e.preventDefault(); openNetworkStore("Telecel"); });
+// 3. SHOPPING CART LOGIC (Saved in localStorage)
+let cart = JSON.parse(localStorage.getItem("shopCart")) || [];
 
-document.getElementById("backToDashboardBtn").addEventListener("click", showDashboard);
-document.getElementById("brandHomeBtn").addEventListener("click", showDashboard);
-document.getElementById("menuDashboard").addEventListener("click", (e) => { e.preventDefault(); showDashboard(); });
-
-document.getElementById("tabStandardBundles").addEventListener("click", (e) => {
-  currentTab = "standard";
-  e.target.classList.add("active");
-  document.getElementById("tabPromoBundles").classList.remove("active");
-  renderBundles();
-});
-
-document.getElementById("tabPromoBundles").addEventListener("click", (e) => {
-  currentTab = "promo";
-  e.target.classList.add("active");
-  document.getElementById("tabStandardBundles").classList.remove("active");
-  renderBundles();
-});
-
-// ==========================================
-// 6. ORDER MODAL & FIRESTORE ORDER SUBMISSION
-// ==========================================
-const orderModal = document.getElementById("orderModal");
-const bundleSelect = document.getElementById("bundleSelect");
-const modalTitle = document.getElementById("modalTitle");
-
-function openOrderModal(network, selectedId) {
-  modalTitle.textContent = `Buy ${network} Data Bundle`;
-  const allPackages = [...BUNDLES[network].standard, ...BUNDLES[network].promo];
-
-  bundleSelect.innerHTML = allPackages
-    .map(
-      (pkg) =>
-        `<option value="${pkg.size}|${pkg.price}" ${pkg.id === selectedId ? "selected" : ""}>
-          ${network} ${pkg.size} - GHS ${pkg.price.toFixed(2)} (${pkg.validity})
-        </option>`
-    )
-    .join("");
-
-  orderModal.style.display = "flex";
+function saveCart() {
+  localStorage.setItem("shopCart", JSON.stringify(cart));
+  renderCart();
 }
 
-document.getElementById("closeModalBtn").addEventListener("click", () => {
-  orderModal.style.display = "none";
-});
-
-document.getElementById("bundleForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const submitBtn = document.getElementById("submitOrderBtn");
-  const [size, price] = bundleSelect.value.split("|");
-  const phone = document.getElementById("recipientPhone").value.trim();
-
-  if (!/^0\d{9}$/.test(phone)) {
-    alert("Please enter a valid 10-digit Ghanaian phone number (e.g., 0241234567).");
-    return;
-  }
-
-  submitBtn.disabled = true;
-  submitBtn.textContent = "Saving Order...";
-
-  const orderCode = "ISC-" + Math.floor(100000 + Math.random() * 900000);
-  const numericPrice = parseFloat(price);
-
-  try {
-    await addDoc(collection(db, "orders"), {
-      orderId: orderCode,
-      userId: currentUser ? currentUser.uid : "guest",
-      customerName: currentUser?.displayName || "Guest Customer",
-      network: currentNetwork,
-      size,
-      price: numericPrice,
-      phone,
-      status: "Processing",
-      createdAt: serverTimestamp()
-    });
-
-    if (currentUser) {
-      const userRef = doc(db, "users", currentUser.uid);
-      await updateDoc(userRef, {
-        points: increment(10)
-      });
-    }
-
-    orderModal.style.display = "none";
-    document.getElementById("bundleForm").reset();
-
-    const msg = encodeURIComponent(
-      `Hello ISC ENTERPRISE, I just placed an order:\n` +
-      `Order ID: ${orderCode}\n` +
-      `Network: ${currentNetwork}\n` +
-      `Bundle: ${size} (GHS ${numericPrice.toFixed(2)})\n` +
-      `Recipient: ${phone}`
-    );
-    window.open(`https://wa.me{msg}`, "_blank");
-  } catch (error) {
-    alert("Error saving order: " + error.message);
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Place Order";
-  }
-});
-
-// ==========================================
-// 7. REAL-TIME ORDERS & LEADERBOARD LISTENERS
-// ==========================================
-function listenToUserOrders(uid) {
-  if (unsubscribeOrders) unsubscribeOrders();
-
-  const ordersList = document.getElementById("ordersList");
-  const countBadge = document.getElementById("orderCountBadge");
-
-  if (!uid) {
-    countBadge.textContent = "0 Orders";
-    ordersList.innerHTML = `<p class="empty-text">Log in to view your saved cloud orders here.</p>`;
-    return;
-  }
-
-  const q = query(
-    collection(db, "orders"),
-    where("userId", "==", uid),
-    orderBy("createdAt", "desc"),
-    limit(20)
+function addToCart(name, price, size = "M") {
+  const existingItem = cart.find(
+    (item) => item.name === name && item.size === size
   );
 
-  unsubscribeOrders = onSnapshot(q, (snapshot) => {
-    countBadge.textContent = `${snapshot.size} Order${snapshot.size === 1 ? "" : "s"}`;
-
-    if (snapshot.empty) {
-      ordersList.innerHTML = `<p class="empty-text">No orders yet. Select a network above to place your first order.</p>`;
-      return;
-    }
-
-    ordersList.innerHTML = "";
-    snapshot.forEach((docSnap) => {
-      const o = docSnap.data();
-      const dateStr = o.createdAt?.toDate
-        ? o.createdAt.toDate().toLocaleString("en-GH", { dateStyle: "medium", timeStyle: "short" })
-        : "Just now";
-
-      ordersList.innerHTML += `
-        <div class="order-item">
-          <div class="order-info">
-            <strong>${o.network} ${o.size} &rarr; ${o.phone}</strong>
-            <span>${o.orderId} &bull; ${dateStr} &bull; GHS ${o.price.toFixed(2)}</span>
-          </div>
-          <span class="status-badge">${o.status}</span>
-        </div>
-      `;
-    });
-  });
-}
-
-function listenToLeaderboard() {
-  const leaderboardBody = document.getElementById("leaderboardBody");
-  const q = query(collection(db, "users"), orderBy("points", "desc"), limit(10));
-
-  onSnapshot(q, (snapshot) => {
-    if (snapshot.empty) {
-      leaderboardBody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 16px;">No customers ranked yet.</td></tr>`;
-      return;
-    }
-
-    let rank = 1;
-    leaderboardBody.innerHTML = "";
-    snapshot.forEach((docSnap) => {
-      const u = docSnap.data();
-      leaderboardBody.innerHTML += `
-        <tr>
-          <td>#${rank++}</td>
-          <td>${u.name || "Customer"}</td>
-          <td>${u.points || 0} pts</td>
-        </tr>
-      `;
-    });
-  });
-}
-
-// ==========================================
-// 8. FIREBASE AUTHENTICATION HANDLERS
-// ==========================================
-const authModal = document.getElementById("authModal");
-const openAuthBtn = document.getElementById("openAuthBtn");
-
-openAuthBtn.addEventListener("click", () => { authModal.style.display = "flex"; });
-document.getElementById("profileIconBtn").addEventListener("click", () => { authModal.style.display = "flex"; });
-document.getElementById("drawerProfileCard").addEventListener("click", () => { closeDrawer(); authModal.style.display = "flex"; });
-document.getElementById("closeAuthBtn").addEventListener("click", () => { authModal.style.display = "none"; });
-
-document.getElementById("toggleAuthModeBtn").addEventListener("click", () => {
-  isSignupMode = !isSignupMode;
-  document.getElementById("nameGroup").style.display = isSignupMode ? "block" : "none";
-  document.getElementById("phoneGroup").style.display = isSignupMode ? "block" : "none";
-  document.getElementById("authModalTitle").textContent = isSignupMode ? "Create ISC Account" : "Login to ISC ENTERPRISE";
-  document.getElementById("authSubmitBtn").textContent = isSignupMode ? "Create Account" : "Login";
-  document.getElementById("authSwitchPrompt").textContent = isSignupMode ? "Already have an account?" : "Don't have an account?";
-  document.getElementById("toggleAuthModeBtn").textContent = isSignupMode ? "Login" : "Create Account";
-});
-
-document.getElementById("authForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const authSubmitBtn = document.getElementById("authSubmitBtn");
-  const email = document.getElementById("authEmail").value.trim();
-  const password = document.getElementById("authPassword").value;
-  const fullName = document.getElementById("authName").value.trim();
-  const phone = document.getElementById("authPhone").value.trim();
-
-  authSubmitBtn.disabled = true;
-  authSubmitBtn.textContent = isSignupMode ? "Creating Account..." : "Logging in...";
-
-  try {
-    if (isSignupMode) {
-      const cred = await createUserWithEmailAndPassword(auth, email, password);
-      const nameToSave = fullName || email.split("@")[0];
-      await updateProfile(cred.user, { displayName: nameToSave });
-
-      await setDoc(doc(db, "users", cred.user.uid), {
-        name: nameToSave,
-        email,
-        phone,
-        points: 0,
-        createdAt: serverTimestamp()
-      });
-    } else {
-      await signInWithEmailAndPassword(auth, email, password);
-    }
-
-    authModal.style.display = "none";
-    document.getElementById("authForm").reset();
-  } catch (error) {
-    alert(error.message);
-  } finally {
-    authSubmitBtn.disabled = false;
-    authSubmitBtn.textContent = isSignupMode ? "Create Account" : "Login";
+  if (existingItem) {
+    existingItem.quantity += 1;
+  } else {
+    cart.push({ name, price: Number(price), size, quantity: 1 });
   }
+
+  saveCart();
+}
+
+function removeFromCart(index) {
+  cart.splice(index, 1);
+  saveCart();
+}
+
+function clearCart() {
+  cart = [];
+  saveCart();
+}
+
+function renderCart() {
+  const cartContainer = document.getElementById("cart-items");
+  const cartTotalEl = document.getElementById("cart-total");
+  const cartCountEl = document.getElementById("cart-count");
+
+  let total = 0;
+  let totalItems = 0;
+
+  cart.forEach((item) => {
+    total += item.price * item.quantity;
+    totalItems += item.quantity;
+  });
+
+  if (cartCountEl) {
+    cartCountEl.textContent = totalItems;
+  }
+
+  if (cartTotalEl) {
+    cartTotalEl.textContent = `GHS ${total.toFixed(2)}`;
+  }
+
+  if (!cartContainer) return;
+
+  if (cart.length === 0) {
+    cartContainer.innerHTML = "<p>Your cart is currently empty.</p>";
+    return;
+  }
+
+  cartContainer.innerHTML = cart
+    .map(
+      (item, index) => `
+      <div class="cart-item">
+        <div>
+          <strong>${item.name}</strong> (Size: ${item.size})<br>
+          <span>GHS ${item.price.toFixed(2)} x ${item.quantity}</span>
+        </div>
+        <button type="button" onclick="removeFromCart(${index})">Remove</button>
+      </div>
+    `
+    )
+    .join("");
+}
+
+// 4. WHATSAPP ORDER CHECKOUT
+function checkoutWhatsApp() {
+  if (cart.length === 0) {
+    alert("Please add an outfit to your cart before ordering.");
+    return;
+  }
+
+  const phoneNumber = "233000000000"; // Replace with your WhatsApp number
+  let message = "Hello, I would like to place an order:\n\n";
+  let total = 0;
+
+  cart.forEach((item, i) => {
+    const subtotal = item.price * item.quantity;
+    total += subtotal;
+    message += `${i + 1}. ${item.name} (Size: ${item.size}) - Qty: ${item.quantity} - GHS ${subtotal.toFixed(2)}\n`;
+  });
+
+  message += `\nTotal: GHS ${total.toFixed(2)}`;
+
+  const url = `https://wa.me{phoneNumber}?text=${encodeURIComponent(message)}`;
+  window.open(url, "_blank");
+}
+
+// 5. INITIALIZE ON PAGE LOAD
+document.addEventListener("DOMContentLoaded", () => {
+  updateGreeting();
+  setInterval(updateGreeting, 60000);
+  renderCart();
 });
-
-document.getElementById("menuLogout").addEventListener("click", async () => {
-  await signOut(auth);
-  closeDrawer();
-});
-
-onAuthStateChanged(auth, async (user) => {
-  currentUser = user;
-  const drawerUserName = document.getElementById("drawerUserName");
-  const drawerProfileSub = document.getElementById("drawerProfileSub");
-  const userPointsBadge = document.getElementById("userPointsBadge");
-  const menuLogout = document.getElementById("menuLogout");
-
-  if (user) {
-    const name = user.displayName || user.email.split("@")[0];
-    openAuthBtn.textContent = name.split(" ")[0];
-    drawerUserName.textContent = name.toUpperCase();
-    drawerProfileSub.textContent = user.email;
-    menuLogout.style.display = "block";
-
