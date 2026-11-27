@@ -1,5 +1,46 @@
+import { initializeApp } from "https://gstatic.com";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  updateProfile
+} from "https://gstatic.com";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  doc,
+  setDoc,
+  updateDoc,
+  increment,
+  query,
+  where,
+  orderBy,
+  limit,
+  onSnapshot,
+  serverTimestamp
+} from "https://gstatic.com";
+
 // ==========================================
-// 1. BUNDLE CATALOG DATA (GHS)
+// 1. YOUR FIREBASE CONFIG (PASTE YOUR KEYS HERE)
+// ==========================================
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_://firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_://appspot.com",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ==========================================
+// 2. BUNDLE CATALOG DATA (GHS)
 // ==========================================
 const BUNDLES = {
   MTN: {
@@ -45,17 +86,14 @@ const BUNDLES = {
 };
 
 // ==========================================
-// 2. STATE MANAGEMENT
+// 3. STATE & AUTOMATIC GHANA GREETING
 // ==========================================
 let currentNetwork = "MTN";
 let currentTab = "standard";
 let isSignupMode = false;
-let currentUser = JSON.parse(localStorage.getItem("isc_user")) || null;
-let orders = JSON.parse(localStorage.getItem("isc_orders")) || [];
+let currentUser = null;
+let unsubscribeOrders = null;
 
-// ==========================================
-// 3. AUTOMATIC REAL-TIME GHANA GREETING & THEME
-// ==========================================
 function getGhanaHour() {
   const ghanaTime = new Date().toLocaleString("en-US", {
     timeZone: "Africa/Accra",
@@ -69,7 +107,8 @@ function updateGreeting() {
   const hour = getGhanaHour();
   const heading = document.getElementById("welcomeHeading");
   const subtitle = document.getElementById("welcomeSubtitle");
-  const firstName = currentUser ? currentUser.name.split(" ") : "Welcome";
+  const displayName = currentUser?.displayName || currentUser?.email?.split("@")[0] || "Welcome";
+  const firstName = displayName.split(" ")[0];
 
   if (hour >= 5 && hour < 12) {
     heading.textContent = `Mema wo akyire, ${firstName}!`;
@@ -86,6 +125,9 @@ function updateGreeting() {
 updateGreeting();
 setInterval(updateGreeting, 30000);
 
+// ==========================================
+// 4. DARK MODE & SIDE DRAWER
+// ==========================================
 const darkModeToggle = document.getElementById("darkModeToggle");
 if (localStorage.getItem("isc_dark") === "true") {
   document.body.classList.add("dark-theme");
@@ -97,9 +139,6 @@ darkModeToggle.addEventListener("change", () => {
   localStorage.setItem("isc_dark", darkModeToggle.checked);
 });
 
-// ==========================================
-// 4. SIDE DRAWER CONTROLS
-// ==========================================
 const sideDrawer = document.getElementById("sideDrawer");
 const drawerOverlay = document.getElementById("drawerOverlay");
 
@@ -118,7 +157,7 @@ document.getElementById("closeDrawerBtn").addEventListener("click", closeDrawer)
 drawerOverlay.addEventListener("click", closeDrawer);
 
 // ==========================================
-// 5. DASHBOARD <-> NETWORK STORE SWITCHER
+// 5. NETWORK STORE & BUNDLE RENDERER
 // ==========================================
 const homeDashboardView = document.getElementById("homeDashboardView");
 const networkStoreView = document.getElementById("networkStoreView");
@@ -201,7 +240,7 @@ document.getElementById("tabPromoBundles").addEventListener("click", (e) => {
 });
 
 // ==========================================
-// 6. ORDER MODAL & ORDER HISTORY
+// 6. ORDER MODAL & FIRESTORE ORDER SUBMISSION
 // ==========================================
 const orderModal = document.getElementById("orderModal");
 const bundleSelect = document.getElementById("bundleSelect");
@@ -227,8 +266,9 @@ document.getElementById("closeModalBtn").addEventListener("click", () => {
   orderModal.style.display = "none";
 });
 
-document.getElementById("bundleForm").addEventListener("submit", (e) => {
+document.getElementById("bundleForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+  const submitBtn = document.getElementById("submitOrderBtn");
   const [size, price] = bundleSelect.value.split("|");
   const phone = document.getElementById("recipientPhone").value.trim();
 
@@ -237,94 +277,131 @@ document.getElementById("bundleForm").addEventListener("submit", (e) => {
     return;
   }
 
-  const newOrder = {
-    id: "ISC-" + Math.floor(100000 + Math.random() * 900000),
-    network: currentNetwork,
-    size,
-    price: parseFloat(price),
-    phone,
-    date: new Date().toLocaleString("en-GH", { dateStyle: "medium", timeStyle: "short" }),
-    status: "Processing"
-  };
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Saving Order...";
 
-  orders.unshift(newOrder);
-  localStorage.setItem("isc_orders", JSON.stringify(orders));
-  renderOrders();
-  updateAuthUI();
-  orderModal.style.display = "none";
-  document.getElementById("bundleForm").reset();
+  const orderCode = "ISC-" + Math.floor(100000 + Math.random() * 900000);
+  const numericPrice = parseFloat(price);
 
-  const msg = encodeURIComponent(
-    `Hello ISC ENTERPRISE, I just placed an order:\n` +
-    `Order ID: ${newOrder.id}\n` +
-    `Network: ${newOrder.network}\n` +
-    `Bundle: ${newOrder.size} (GHS ${newOrder.price.toFixed(2)})\n` +
-    `Recipient: ${newOrder.phone}`
-  );
-  window.open(`https://wa.me{msg}`, "_blank");
+  try {
+    await addDoc(collection(db, "orders"), {
+      orderId: orderCode,
+      userId: currentUser ? currentUser.uid : "guest",
+      customerName: currentUser?.displayName || "Guest Customer",
+      network: currentNetwork,
+      size,
+      price: numericPrice,
+      phone,
+      status: "Processing",
+      createdAt: serverTimestamp()
+    });
+
+    if (currentUser) {
+      const userRef = doc(db, "users", currentUser.uid);
+      await updateDoc(userRef, {
+        points: increment(10)
+      });
+    }
+
+    orderModal.style.display = "none";
+    document.getElementById("bundleForm").reset();
+
+    const msg = encodeURIComponent(
+      `Hello ISC ENTERPRISE, I just placed an order:\n` +
+      `Order ID: ${orderCode}\n` +
+      `Network: ${currentNetwork}\n` +
+      `Bundle: ${size} (GHS ${numericPrice.toFixed(2)})\n` +
+      `Recipient: ${phone}`
+    );
+    window.open(`https://wa.me{msg}`, "_blank");
+  } catch (error) {
+    alert("Error saving order: " + error.message);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Place Order";
+  }
 });
 
-function renderOrders() {
+// ==========================================
+// 7. REAL-TIME ORDERS & LEADERBOARD LISTENERS
+// ==========================================
+function listenToUserOrders(uid) {
+  if (unsubscribeOrders) unsubscribeOrders();
+
   const ordersList = document.getElementById("ordersList");
   const countBadge = document.getElementById("orderCountBadge");
-  countBadge.textContent = `${orders.length} Order${orders.length === 1 ? "" : "s"}`;
 
-  if (orders.length === 0) {
-    ordersList.innerHTML = `<p class="empty-text">Log in or place an order to view your data bundles here.</p>`;
+  if (!uid) {
+    countBadge.textContent = "0 Orders";
+    ordersList.innerHTML = `<p class="empty-text">Log in to view your saved cloud orders here.</p>`;
     return;
   }
 
-  ordersList.innerHTML = orders
-    .map(
-      (o) => `
-      <div class="order-item">
-        <div class="order-info">
-          <strong>${o.network} ${o.size} &rarr; ${o.phone}</strong>
-          <span>${o.id} &bull; ${o.date} &bull; GHS ${o.price.toFixed(2)}</span>
+  const q = query(
+    collection(db, "orders"),
+    where("userId", "==", uid),
+    orderBy("createdAt", "desc"),
+    limit(20)
+  );
+
+  unsubscribeOrders = onSnapshot(q, (snapshot) => {
+    countBadge.textContent = `${snapshot.size} Order${snapshot.size === 1 ? "" : "s"}`;
+
+    if (snapshot.empty) {
+      ordersList.innerHTML = `<p class="empty-text">No orders yet. Select a network above to place your first order.</p>`;
+      return;
+    }
+
+    ordersList.innerHTML = "";
+    snapshot.forEach((docSnap) => {
+      const o = docSnap.data();
+      const dateStr = o.createdAt?.toDate
+        ? o.createdAt.toDate().toLocaleString("en-GH", { dateStyle: "medium", timeStyle: "short" })
+        : "Just now";
+
+      ordersList.innerHTML += `
+        <div class="order-item">
+          <div class="order-info">
+            <strong>${o.network} ${o.size} &rarr; ${o.phone}</strong>
+            <span>${o.orderId} &bull; ${dateStr} &bull; GHS ${o.price.toFixed(2)}</span>
+          </div>
+          <span class="status-badge">${o.status}</span>
         </div>
-        <span class="status-badge">${o.status}</span>
-      </div>
-    `
-    )
-    .join("");
+      `;
+    });
+  });
 }
 
-document.getElementById("clearOrdersBtn").addEventListener("click", () => {
-  if (confirm("Clear your recent order history?")) {
-    orders = [];
-    localStorage.removeItem("isc_orders");
-    renderOrders();
-    updateAuthUI();
-  }
-});
+function listenToLeaderboard() {
+  const leaderboardBody = document.getElementById("leaderboardBody");
+  const q = query(collection(db, "users"), orderBy("points", "desc"), limit(10));
+
+  onSnapshot(q, (snapshot) => {
+    if (snapshot.empty) {
+      leaderboardBody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 16px;">No customers ranked yet.</td></tr>`;
+      return;
+    }
+
+    let rank = 1;
+    leaderboardBody.innerHTML = "";
+    snapshot.forEach((docSnap) => {
+      const u = docSnap.data();
+      leaderboardBody.innerHTML += `
+        <tr>
+          <td>#${rank++}</td>
+          <td>${u.name || "Customer"}</td>
+          <td>${u.points || 0} pts</td>
+        </tr>
+      `;
+    });
+  });
+}
 
 // ==========================================
-// 7. AUTH MODAL & LEADERBOARD
+// 8. FIREBASE AUTHENTICATION HANDLERS
 // ==========================================
 const authModal = document.getElementById("authModal");
 const openAuthBtn = document.getElementById("openAuthBtn");
-
-function updateAuthUI() {
-  const drawerUserName = document.getElementById("drawerUserName");
-  const drawerProfileSub = document.getElementById("drawerProfileSub");
-  const userPointsBadge = document.getElementById("userPointsBadge");
-  const menuLogout = document.getElementById("menuLogout");
-
-  if (currentUser) {
-    openAuthBtn.textContent = currentUser.name.split(" ");
-    drawerUserName.textContent = currentUser.name.toUpperCase();
-    drawerProfileSub.textContent = currentUser.email;
-    userPointsBadge.textContent = `Loyalty Points: ${orders.length * 10} pts`;
-    menuLogout.style.display = "block";
-  } else {
-    openAuthBtn.textContent = "Login";
-    drawerUserName.textContent = "ISC GUEST";
-    drawerProfileSub.textContent = "Tap to Login / Sign Up";
-    userPointsBadge.textContent = "Sign in to earn loyalty points";
-    menuLogout.style.display = "none";
-  }
-  updateGreeting();
-}
 
 openAuthBtn.addEventListener("click", () => { authModal.style.display = "flex"; });
 document.getElementById("profileIconBtn").addEventListener("click", () => { authModal.style.display = "flex"; });
@@ -341,58 +418,60 @@ document.getElementById("toggleAuthModeBtn").addEventListener("click", () => {
   document.getElementById("toggleAuthModeBtn").textContent = isSignupMode ? "Login" : "Create Account";
 });
 
-document.getElementById("authForm").addEventListener("submit", (e) => {
+document.getElementById("authForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+  const authSubmitBtn = document.getElementById("authSubmitBtn");
   const email = document.getElementById("authEmail").value.trim();
-  const nameInput = document.getElementById("authName").value.trim();
-  const displayName = isSignupMode && nameInput ? nameInput : email.split("@");
+  const password = document.getElementById("authPassword").value;
+  const fullName = document.getElementById("authName").value.trim();
+  const phone = document.getElementById("authPhone").value.trim();
 
-  currentUser = { name: displayName, email };
-  localStorage.setItem("isc_user", JSON.stringify(currentUser));
-  authModal.style.display = "none";
-  updateAuthUI();
+  authSubmitBtn.disabled = true;
+  authSubmitBtn.textContent = isSignupMode ? "Creating Account..." : "Logging in...";
+
+  try {
+    if (isSignupMode) {
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      const nameToSave = fullName || email.split("@")[0];
+      await updateProfile(cred.user, { displayName: nameToSave });
+
+      await setDoc(doc(db, "users", cred.user.uid), {
+        name: nameToSave,
+        email,
+        phone,
+        points: 0,
+        createdAt: serverTimestamp()
+      });
+    } else {
+      await signInWithEmailAndPassword(auth, email, password);
+    }
+
+    authModal.style.display = "none";
+    document.getElementById("authForm").reset();
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    authSubmitBtn.disabled = false;
+    authSubmitBtn.textContent = isSignupMode ? "Create Account" : "Login";
+  }
 });
 
-document.getElementById("menuLogout").addEventListener("click", () => {
-  currentUser = null;
-  localStorage.removeItem("isc_user");
+document.getElementById("menuLogout").addEventListener("click", async () => {
+  await signOut(auth);
   closeDrawer();
-  updateAuthUI();
 });
 
-function renderLeaderboard() {
-  const topCustomers = [
-    { rank: "1st", name: "Kwame Boateng", points: 480 },
-    { rank: "2nd", name: "Abena Mensah", points: 390 },
-    { rank: "3rd", name: "Kofi Asante", points: 310 },
-    { rank: "4th", name: "Ama Osei", points: 240 },
-    { rank: "5th", name: "Yaw Owusu", points: 190 }
-  ];
+onAuthStateChanged(auth, async (user) => {
+  currentUser = user;
+  const drawerUserName = document.getElementById("drawerUserName");
+  const drawerProfileSub = document.getElementById("drawerProfileSub");
+  const userPointsBadge = document.getElementById("userPointsBadge");
+  const menuLogout = document.getElementById("menuLogout");
 
-  document.getElementById("leaderboardBody").innerHTML = topCustomers
-    .map(
-      (c) => `
-      <tr>
-        <td>${c.rank}</td>
-        <td>${c.name}</td>
-        <td>${c.points} pts</td>
-      </tr>
-    `
-    )
-    .join("");
-}
+  if (user) {
+    const name = user.displayName || user.email.split("@")[0];
+    openAuthBtn.textContent = name.split(" ")[0];
+    drawerUserName.textContent = name.toUpperCase();
+    drawerProfileSub.textContent = user.email;
+    menuLogout.style.display = "block";
 
-document.getElementById("ordersBtn").addEventListener("click", () => {
-  document.getElementById("orders-section").scrollIntoView({ behavior: "smooth" });
-});
-document.getElementById("transactionsBtn").addEventListener("click", () => {
-  document.getElementById("leaderboard-section").scrollIntoView({ behavior: "smooth" });
-});
-document.getElementById("chatBtn").addEventListener("click", () => {
-  window.open("https://wa.me.", "_blank");
-});
-
-// Initialize app
-updateAuthUI();
-renderOrders();
-renderLeaderboard();
